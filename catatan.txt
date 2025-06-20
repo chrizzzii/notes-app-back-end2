@@ -1,0 +1,10 @@
+Service akan fokus dalam menangani operasi CRUD pada resource, 
+sedangkan handler akan fokus dalam menangani response pada client.
+Folder notes dan tiga berkas di dalamnya adalah Hapi plugin. 
+Plugin notes akan bertanggung jawab untuk menangani setiap permintaan yang mengarah ke url /notes.
+Untuk request handling akan disimpan pada handler.js, untuk masalah routing akan disimpan di dalam routes.js, 
+dan untuk pluginnya sendiri akan disimpan pada index.js.
+Berkas NotesService.js bertanggung jawab untuk mengelola resource notes yang disimpan pada memory (array). 
+Pemberian nama fungsi handler diambil dari kombinasi method, kemudian path, dan diakhiri dengan kata ‘Handler’.
+Penggunaan nama variabel diawali underscore (_) dipertimbangkan sebagai lingkup privat secara konvensi.
+Fungsi handler digunakan untuk menangani permintaan dari client yang datang kemudian memberikan respons dan sebaiknya memang hanya sebatas itu.
