@@ -8,3 +8,5 @@ Berkas NotesService.js bertanggung jawab untuk mengelola resource notes yang dis
 Pemberian nama fungsi handler diambil dari kombinasi method, kemudian path, dan diakhiri dengan kata ‘Handler’.
 Penggunaan nama variabel diawali underscore (_) dipertimbangkan sebagai lingkup privat secara konvensi.
 Fungsi handler digunakan untuk menangani permintaan dari client yang datang kemudian memberikan respons dan sebaiknya memang hanya sebatas itu.
+
+newman run Notes-API-Test.postman_collection.json -e Notes-API-Test.postman_environment.json
