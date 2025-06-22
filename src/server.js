@@ -8,6 +8,7 @@ const Jwt = require('@hapi/jwt');
 const notes = require('./api/notes');
 const NotesService = require('./services/postgres/NotesService');
 const NotesValidator = require('./validator/notes');
+const ClientError = require('./exceptions/ClientError');
 
 // users
 const users = require('./api/users');
@@ -20,8 +21,14 @@ const AuthenticationsService = require('./services/postgres/AuthenticationsServi
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
 
+// collaborations
+const collaborations = require('./api/collaborations');
+const CollaborationsService = require('./services/postgres/CollaborationsService');
+const CollaborationsValidator = require('./validator/collaborations');
+
 const init = async () => {
-  const notesService = new NotesService();
+  const collaborationsService = new CollaborationsService();
+  const notesService = new NotesService(collaborationsService);
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
 
@@ -83,36 +90,28 @@ const init = async () => {
         validator: AuthenticationsValidator,
       },
     },
+    {
+      plugin: collaborations,
+      options: {
+        collaborationsService,
+        notesService,
+        validator: CollaborationsValidator,
+      },
+    },
   ]);
 
-  const ClientError = require('./exceptions/ClientError');
-
   server.ext('onPreResponse', (request, h) => {
+    // mendapatkan konteks response dari request
     const { response } = request;
 
-    if (response instanceof Error) {
-      // Client error (custom error seperti ValidationError)
-      if (response instanceof ClientError) {
-        return h.response({
-          status: 'fail',
-          message: response.message,
-        }).code(response.statusCode);
-      }
-
-      // Error dari Hapi seperti 404
-      if (response.isBoom && response.output?.statusCode === 404) {
-        return h.response({
-          status: 'fail',
-          message: 'Resource tidak ditemukan',
-        }).code(404);
-      }
-
-      // Server error
-      console.error(response);
-      return h.response({
-        status: 'error',
-        message: 'Terjadi kegagalan pada server kami.',
-      }).code(500);
+    // penanganan client error secara internal.
+    if (response instanceof ClientError) {
+      const newResponse = h.response({
+        status: 'fail',
+        message: response.message,
+      });
+      newResponse.code(response.statusCode);
+      return newResponse;
     }
 
     return h.continue;
